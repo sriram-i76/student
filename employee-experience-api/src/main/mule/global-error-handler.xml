@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<error-handler name="global-error-handlerError_Handler" doc:id="9cc63bdf-805f-4002-97a8-0f1365045230" >
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="2159567e-dd5d-4177-9d04-0171a32ffbda" type="APIKIT:BAD_REQUEST" >
+			<logger level="INFO" doc:name="api bad request" doc:id="439f2d2a-d085-4def-aa8f-8a482fbce2b3" message="api bad request"/>
+			<ee:transform doc:name="Transform Message" doc:id="6b0f5dda-1bdf-4ff2-8740-b79082973b0c" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Bad request"}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[400]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="9a96dfa1-ee3d-40f9-8bd9-0b094d9a6c01" type="APIKIT:NOT_FOUND" >
+			<logger level="INFO" doc:name="api-kit not found" doc:id="efd5d014-86be-4077-81fa-8d5342d227e8" message="api-kit not found"/>
+			<ee:transform doc:name="Transform Message" doc:id="c1eca83c-96ad-4461-b228-15df1769d795" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[404]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="5c79b144-c296-4fdc-bca9-657363783378" type="APIKIT:METHOD_NOT_ALLOWED" >
+			<logger level="INFO" doc:name="method not allowed" doc:id="4a0f7bcb-a267-47a7-8272-951398e96a62" message="method not allowed"/>
+			<ee:transform doc:name="Transform Message" doc:id="8621c044-7daf-4481-b45c-9c554e4419ca" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Method not allowed"}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[405]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="4d83261b-ccc5-4637-8b7f-53db1ebbfb5c" type="APIKIT:NOT_ACCEPTABLE" >
+			<logger level="INFO" doc:name="api kit not acceptable" doc:id="63e1a09a-b1bc-4fb7-acfb-0848842f9df4" message="api kit not acceptable"/>
+			<ee:transform doc:name="Transform Message" doc:id="8ef6c8f7-7537-4956-bb59-092038b044df" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not acceptable"}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[406]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="39e4e0c0-bc07-4e4b-ad0a-315fd24fb881" type="APIKIT:UNSUPPORTED_MEDIA_TYPE" >
+			<logger level="INFO" doc:name="unsupported media type" doc:id="c983e6f6-e16d-46dc-b904-84484e0a4f4d" message="unsupported media type"/>
+			<ee:transform doc:name="Transform Message" doc:id="af04facc-8ef6-4b09-b049-4be2cbf7d0ba" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Unsupported media type"}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[415]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="07121a39-e3f3-4744-b462-e9f46f2b4fc9" type="APIKIT:NOT_IMPLEMENTED" >
+			<logger level="INFO" doc:name="api kit not implemented" doc:id="e4ca397d-cf5b-46a6-af8e-4365abba8b32" message="api kit not implemented"/>
+			<ee:transform doc:name="Transform Message" doc:id="b1a46e29-d33c-42c5-98d7-d4aab379204c" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not Implemented"}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[501]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+		</on-error-propagate>
+	</error-handler>
+</mule>
