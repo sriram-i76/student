@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<sub-flow name="post-students-sub-flow" doc:id="ec591a7e-00e6-4865-87c6-22a0c2369e80" >
+		<logger level="INFO" doc:name="post student subflow started in process-api" doc:id="f41086ec-6d07-4062-8173-0e1b57c98fb0" message="post student subflow started in process-api"/>
+		<http:request method="POST" doc:name="Request to call Post-student in system-api" doc:id="0e19e28d-8509-4245-a8ea-0e1882cccc7c" config-ref="request-configuration-calling-system-api" path="${http.db.path}" />
+		<logger level="INFO" doc:name="getting back to process-api after inserting records" doc:id="68e924bb-8332-485e-981d-9a459d6ff001" message="getting back to process-api after inserting records"/>
+	</sub-flow>
+</mule>

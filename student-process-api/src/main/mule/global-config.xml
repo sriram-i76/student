@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway"
+	xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/sftp http://www.mulesoft.org/schema/mule/sftp/current/mule-sftp.xsd
+http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd">
+	<configuration-properties doc:name="Configuration properties" doc:id="d68e29a3-7468-45ce-99dc-772261bbe794" file="config-${mule.env}.properties" />
+	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="3dc85162-f4f2-418f-93d9-ee28cdb8e0a8" file="secure-config.properties" key="${mule.key}" >
+		<secure-properties:encrypt algorithm="Blowfish" />
+	</secure-properties:config>
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="32d19c88-d99c-4d6d-8ff5-c381215c667c" >
+		<http:listener-connection host="${listener.host}" port="${listener.port}" />
+	</http:listener-config>
+	 <apikit:config name="student-process-api-config" api="resource::bea8fe9d-8d70-43c4-ac46-4d41ea414961:student-process-api:1.0.0:raml:zip:student-process-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+	<http:request-config name="request-configuration-calling-system-api" doc:name="HTTP Request configuration" doc:id="1a95df87-be9a-4914-aade-8563cd5be230" >
+		<http:request-connection protocol="${http.protocol}" host="${http.host}" port="${http.port}" />
+	</http:request-config>
+	<sftp:config name="SFTP_Config" doc:name="SFTP Config" doc:id="6b81d9b0-28c8-448e-b227-7c0b699b60f4" >
+		<sftp:connection port="${sftp.port}" host="${sftp.host}" username="${sftp.username}" password="${secure::sftp.password}"/>
+	</sftp:config>
+	<api-gateway:autodiscovery apiId="${api.id}" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="b78bfdc6-9506-4829-a4bb-d9da25701829" flowRef="student-process-api-main" />
+</mule>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/sftp http://www.mulesoft.org/schema/mule/sftp/current/mule-sftp.xsd">
+	<flow name="scheduler-check-joined-subflow" doc:id="a5e0aa84-45f9-4e5c-b677-5d5e3469156a" >
+		<scheduler doc:name="Scheduler to schedule poling logic for every 5 mins" doc:id="a8fd5fcf-4f12-4531-8ab1-4fc8e0930694" >
+			<scheduling-strategy >
+				<fixed-frequency frequency="${scheduler.freq}" timeUnit="MINUTES"/>
+			</scheduling-strategy>
+		</scheduler>
+		<logger level="INFO" doc:name="entered into scheduler flow" doc:id="150c020d-df37-47b7-9e14-19f66a4b1724" message="entered into scheduler flow"/>
+		<logger level="INFO" doc:name="calling send-email resource in system api" doc:id="674de774-5057-4f47-99b5-5a41db34a148" message="calling send-email resource in system api"/>
+		<http:request method="GET" doc:name="Request to call students-notJoined resource in system-api" doc:id="415d043f-74cf-4e15-8478-287965939448" config-ref="request-configuration-calling-system-api" path="${http.notjoined.path}"/>
+		<foreach doc:name="Iterate over the list of students who have not joined" doc:id="e8ec9202-14ff-4b48-bdb2-e4bea838c82a" collection="#[payload]">
+			<set-variable value="#[payload]" doc:name="Variable to store the notJoined student records" doc:id="24c42798-e542-4bbb-a2b6-c47ad34abcc8" variableName="notJoined" />
+			<http:request method="POST" doc:name="Request to call send-email resource" doc:id="2b5bc69d-328c-4b22-a58d-5eca0518f08a" config-ref="request-configuration-calling-system-api" path="${http.email.path}">
+				<http:body ><![CDATA[#[vars.notJoined]]]></http:body>
+			</http:request>
+			<set-variable value='#["studentReminder_" ++ (vars.notJoined.student_id default "unknown") ++ "_" ++ now() as String {format: "yyyyMMddHHmmssSSS"} ++ ".json"]' doc:name="Set Variable to store the file name" doc:id="89eb7587-f989-4446-98c4-bfad6b04ebb2" variableName="fileName" />
+			<try doc:name="Try" doc:id="90aa39bd-5598-49dc-ae09-a5547b2f66bc" >
+				<until-successful maxRetries="${until.tries}" doc:name="Until Successful" doc:id="eda79205-1a85-4609-a070-52169bff48d8" millisBetweenRetries="${until.time}">
+				<sftp:write doc:name="Write the records of Notjoined to seperate files" doc:id="add95839-9083-4e7e-b41e-795824053ee6" config-ref="SFTP_Config" path='#["/POC4/notjoined/" ++ vars.fileName as String]'>
+				<sftp:content><![CDATA[#[vars.notJoined]]]></sftp:content>
+			</sftp:write>
+			</until-successful>
+				<logger level="INFO" doc:name="File write successful" doc:id="41f46302-6d31-475e-8d2e-1565d481f0bc" message="File write successful with file name: #[vars.fileName as String]"/>
+				<sftp:list doc:name="List" doc:id="d5e118e2-b1ff-4844-bee2-9d8d0d4ae87f" config-ref="SFTP_Config" directoryPath="/POC4/notjoined"/>
+				<logger level="INFO" doc:name="Logger" doc:id="c941805e-1cd6-467e-8041-f7e199c36c79" message="#[attributes]"/>
+				<!-- [STUDIO:"Set Variable"]<set-variable value="#[attributes.fileName&#93;" doc:name="Set Variable" doc:id="95c19b33-47e5-4842-98d1-366edabf9ed5" variableName="filePath"/> [STUDIO] -->
+				<!-- [STUDIO:"Logger"]<logger level="INFO" doc:name="Logger" doc:id="3466610b-e5b7-4beb-9c3f-82f222d6a4ce" message="#[vars.filePath&#93;"/> [STUDIO] -->
+				<!-- [STUDIO:"Read"]<sftp:read doc:name="Read" doc:id="000e4059-fc4b-4229-925c-796598ec904a" config-ref="SFTP_Config" path="#[vars.filepath as String&#93;"/> [STUDIO] -->
+				<!-- [STUDIO:"Set Variable"]<set-variable value="#[payload&#93;" doc:name="Set Variable" doc:id="9c3ba667-50b9-4a00-a9f8-5d80460cd1f7" variableName="fileData"/> [STUDIO] -->
+				<!-- [STUDIO:"Logger"]<logger level="INFO" doc:name="Logger" doc:id="d72d4943-d2e6-400b-aacb-d1fdff46f3e2" message="#[vars.fileData&#93;"/> [STUDIO] -->
+				<!-- [STUDIO:"Choice"]<choice doc:name="Choice" doc:id="8696c01c-a7b1-4da0-8c7d-d8b8ec0bd018" >
+					<when expression="#[vars.fileData.has_joined=='yes'&#93;">
+						<sftp:move doc:name="Move" doc:id="4ab962b1-1068-483d-a80c-c2ff05899ed4" config-ref="SFTP_Config" sourcePath='#["/POC4/notjoined/" ++ vars.filePath as String&#93;' targetPath="/POC4/updated"/>
+					</when>
+					<otherwise >
+						<logger level="INFO" doc:name="Logger" doc:id="4dd4f8f9-f94f-4a29-9198-89fdbaf2fd1e" message="joined status has not updated"/>
+					</otherwise>
+				</choice> [STUDIO] -->
+				<error-handler ref="global-error-handler" />
+			</try>
+		</foreach>
+		<error-handler ref="global-error-handler" />
+	</flow>
+</mule>
