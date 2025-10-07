@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="patch-student-sub-flow" doc:id="43f16ab6-6cb1-40e6-aaa9-dec036b0af9f" >
+		<logger level="INFO" doc:name="entered into the patch student flow of experience api" doc:id="d627c225-1413-4afc-9542-74665335f4e6" message="entered into the patch student flow of experience api"/>
+		<http:request method="PATCH" doc:name="Request to call patch-students in process-api" doc:id="f0ac7bc0-2216-409a-bb65-e1e0532f4323" config-ref="HTTP-Request-configuration-calling-process-api" path="${http.path}/{student_id}">
+			<http:uri-params ><![CDATA[#[{
+	student_id: attributes.uriParams.student_id
+}]]]></http:uri-params>
+            
+		</http:request>
+		<logger level="INFO" doc:name="records updated successfully" doc:id="54a9e44e-7293-468e-a26c-1e8655971367" message="records updated successfully"/>
+	</sub-flow>
+</mule>

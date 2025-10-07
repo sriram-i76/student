@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd ">
+    
+    <flow name="student-experience-api-main" doc:id="b52f29eb-4df6-4ec3-8788-df817c5a8b27">
+        <http:listener path="${listener.path}" config-ref="HTTP_Listener_config">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="student-experience-api-config" />
+		<error-handler ref="global-error-handler" />
+    </flow>
+    <flow name="patch:\students\(student_id):application\json:student-experience-api-config" doc:id="12b0c3a1-a8fa-4b7b-a562-c98d6d2fe9b1">
+		<flow-ref doc:name="Flow Reference" doc:id="6a83bd1b-1359-4b02-a303-78e6e0e1a05d" name="patch-student-sub-flow"/>
+		<ee:transform doc:name="updated records" doc:id="b25d98dc-5936-42ae-8bdb-aae2c476ae0c" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler ref="global-error-handler" />
+	
+    </flow>
+    <flow name="get:\students:student-experience-api-config" doc:id="1b5d9b47-b7f7-46f3-ad32-36bc805a1096">
+        <flow-ref doc:name="Flow Reference" doc:id="2d81ada2-d22e-4dee-91b3-a6a16318693b" name="get-student-sub-flow"/>
+		<ee:transform doc:name="Students records retrieved successfully from database" doc:id="056e8bcc-a702-4a30-bb09-5d04609f96f3" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+    </flow>
+    <flow name="post:\students:application\json:student-experience-api-config">
+		<logger level="INFO" doc:name="experience-api started" doc:id="05a0c1e4-c503-4cf8-928b-1cdd667b0c4f" message="experience-api started"/>
+		<flow-ref doc:name="Flow Reference" doc:id="a88cff74-a293-4105-8f4f-ecd6f441bda4" name="post-student-sub-flow"/>
+		<ee:transform doc:name="Student added successfully" doc:id="4a6aa031-d838-4e80-83f6-d93620a05e36" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  message: "Student added successfully"
+} ]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+    </flow>
+</mule>

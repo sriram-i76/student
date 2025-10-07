@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway"
+	xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd">
+	<configuration-properties doc:name="Configuration properties" doc:id="b59160bd-107d-4ad5-b57c-88cfa32da928" file="config-${mule.env}.properties" />
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="200bc78a-cbd4-4b78-8f72-2e50b1a51753" >
+		<http:listener-connection host="${listener.host}" port="${listener.port}" />
+	</http:listener-config>
+	<apikit:config name="student-experience-api-config" api="resource::bea8fe9d-8d70-43c4-ac46-4d41ea414961:student-experience-api:1.0.0:raml:zip:student-experience-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+	<http:request-config name="HTTP-Request-configuration-calling-process-api" doc:name="HTTP Request configuration" doc:id="164f22f5-6232-4843-b4aa-85825a37c9b3" >
+		<http:request-connection protocol="${http.protocol}" host="${http.host}" port="${http.port}" />
+	</http:request-config>
+	<api-gateway:autodiscovery apiId="${api.id}" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="f4323708-3a6b-432c-88a0-abbdbd947ecc" flowRef="student-experience-api-main" />
+</mule>

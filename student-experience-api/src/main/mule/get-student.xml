@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<sub-flow name="get-student-sub-flow" doc:id="601b2585-33cc-4dd4-9240-1176e36d3f79" >
+		<logger level="INFO" doc:name="entered into get-students flow in experience layer" doc:id="39662482-e39b-42ce-97f4-b1dd4e334ffe" message="entered into get-students flow in experience layer"/>
+		<http:request method="GET" doc:name="Request to call get-Students in process-api" doc:id="34439c41-30f0-47ef-ac1f-9ad272a18fc8" config-ref="HTTP-Request-configuration-calling-process-api" path="${http.path}">
+			<http:query-params ><![CDATA[#[attributes.queryParams]]]></http:query-params>
+		</http:request>
+		<logger level="INFO" doc:name="student records retrieved successfully" doc:id="0637e73c-71fe-40ce-863f-fcbc43dc47ff" message="student records retrieved successfully"/>
+	</sub-flow>
+</mule>
