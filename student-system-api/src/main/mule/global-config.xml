@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway" xmlns:email="http://www.mulesoft.org/schema/mule/email" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation=" http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd
+http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd">
+    <configuration-properties doc:name="Configuration properties" doc:id="533b4db0-ea35-40c1-8361-a5e2b5bcbb06" file="config-${mule.env}.properties" />
+    <secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="54a87ce5-a30f-4ef4-9e13-a6c874f3024a" file="secure-config.properties" key="${mule.key}">
+        <secure-properties:encrypt algorithm="Blowfish" />
+    </secure-properties:config>
+    <http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="92b2637e-3917-4f8e-bd45-45257f5cf449">
+        <http:listener-connection host="${listener.host}" port="${listener.port}" />
+    </http:listener-config>
+    <db:config name="Database_Config" doc:name="Database Config" doc:id="e7036a68-300d-4125-939e-63378b908721">
+        <db:generic-connection url="${db.url}" user="${db.user}" driverClassName="${db.driver-class}" password="${secure::db.password}" />
+    </db:config>
+    <apikit:config name="student-system-api-config" api="resource::bea8fe9d-8d70-43c4-ac46-4d41ea414961:student-system-api:1.0.1:raml:zip:student-system-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+	<email:smtp-config name="Email_SMTP" doc:name="Email SMTP" doc:id="db7ab0bd-35f3-4151-8e32-496ca6e4524f" >
+		<email:smtp-connection host="${smtp.host}" user="${smtp.from.address}" password="${secure::smtp.password}" port="${smtp.port}">
+			<email:properties >
+				<email:property key="mail.smtp.starttls.enable" value="true" />
+			</email:properties>
+		</email:smtp-connection>
+	</email:smtp-config>
+	<api-gateway:autodiscovery apiId="${api.id}" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="237880fb-b970-4cad-ada8-735ddd0cfc41" flowRef="student-system-api-main" />
+</mule>

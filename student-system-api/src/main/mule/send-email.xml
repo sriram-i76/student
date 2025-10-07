@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:email="http://www.mulesoft.org/schema/mule/email"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="send-email-sub-flow" doc:id="11c6e74b-ed6d-4461-9fad-33fbaed0ac70" >
+		<logger level="INFO" doc:name="entered into the send-email subflow" doc:id="bf0d9fe4-4c6c-45b6-9d16-ede58dacb4ed" message="entered into the send-email subflow"/>
+		<set-variable value="#[payload.email]" doc:name="Set Variable to store the username" doc:id="b7299741-2f22-4253-830b-7a530d61d071" variableName="username"/>
+		<ee:transform doc:name="Using html format data which is accepted by SFTP-send" doc:id="5354cb8c-6af8-4e63-bd96-27837bb5a5e3" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output text/plain
+---
+"<html>
+<head>
+<title>Email</title>
+<style>
+    body {
+      font-family: Arial, sans-serif;
+      color: #333;
+      padding: 10px;
+    }
+    p {
+      font-size: 15px;
+    }
+</style>
+</head>
+<body>
+<p>Hi " ++ (payload.student_name default "Student") ++ ",</p>
+<p>Our records show that you haven’t completed the joining process. Please do so at the earliest.</p>
+<p>Regards,<br/>Admin Team</p>
+</body>
+</html>"]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<parse-template doc:name="Parsing the payload" doc:id="46d66370-541c-48dd-832b-874667e9ac13" >
+			<content >#[payload]</content>
+		</parse-template>
+		<email:send doc:name="Sending email alerts to the students who are not joined still" doc:id="ecb66951-bf0e-4064-97cd-9dd14815b885" config-ref="Email_SMTP" fromAddress="${smtp.from.address}" subject="Joining Reminder">
+			<email:to-addresses >
+				<email:to-address value="#[vars.username]" />
+			</email:to-addresses>
+			<email:body contentType="text/html" encoding="UTF-8">
+			</email:body>
+		</email:send>
+		<ee:transform doc:name="Transform Message" doc:id="87b44ec0-8d6f-4f1c-a1a8-7d25648df64a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	
+  message: "Email sent successfully"
+}
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+</mule>

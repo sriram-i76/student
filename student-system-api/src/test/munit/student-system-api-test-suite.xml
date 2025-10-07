@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="student-system-api-test-suite.xml" />
+	<munit:test name="student-system-api-test-suite-patch:\students\(student_id):application\json:student-system-api-configTest" doc:id="97b1b950-2459-4e22-af34-79299f2f725c" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="a4e8516a-10dd-4180-8a0c-0a47a41983d4" processor="db:update">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Update the database records of a particular record" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="73ea3770-e6ae-4af0-8716-f221ed8c8857" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[{ "student_id": 1, "has_joined": "Yes" }]' />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="0387321e-550d-4349-b951-ad49192484fc">
+				<munit:payload value='#[{ "has_joined": "Yes" }]' />
+				<munit:attributes value='#[{&#10;  uriParams: {&#10;    student_id: "1"&#10;  }&#10;}]' />
+				<munit:variables>
+					<munit:variable key="student_id" value="1" />
+				</munit:variables>
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to patch:\students\(student_id):application\json:student-system-api-config" doc:id="989afd8e-627e-47f9-bb72-f24d9432dce1" name="patch:\students\(student_id):application\json:student-system-api-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="38891e4f-872d-4251-a237-d6eb76bcbb90" expression="#[payload]" is="#[MunitTools::equalTo({ student_id: 1, has_joined: 'Yes' })]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="student-system-api-test-suite-get:\students:student-system-api-configTest" doc:id="afce724b-f9d4-460a-aede-8363b5092163" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="6e28a0ef-c640-4d30-b5e1-c6f72923ba11" processor="db:select">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Select to retrive the student data based on the queryparams" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="22ebb1de-90a7-41d9-ac0c-766dec4bec1c" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[{&#10;        "student_id": 2,&#10;        "student_name": "Neha Verma",&#10;        "email": "neha.verma22@example.com",&#10;        "phone_number": "9012345678",&#10;        "date_of_joining": "2025-08-10",&#10;        "has_joined": "No"&#10;    }]' />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="db6879e1-d25b-4c27-9a62-3d6c267f8d84" >
+				<munit:attributes value='#[{&#10;  "queryParams": {&#10;    "has_joined": "Yes"&#10;  }&#10;}]' />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to get:\students:student-system-api-config" doc:id="02f62998-e5ef-469b-9144-b335f7ee9696" name="get:\students:student-system-api-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="df1a894f-cf29-4da3-b6c2-622e61e16d99" expression="#[payload]" is='#[MunitTools::equalTo( {&#10;        "student_id": 2,&#10;        "student_name": "Neha Verma",&#10;        "email": "neha.verma22@example.com",&#10;        "phone_number": "9012345678",&#10;        "date_of_joining": "2025-08-10",&#10;        "has_joined": "No"&#10;    })]'/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="student-system-api-test-suite-post:\students:application\json:student-system-api-configTest" doc:id="5389c26f-b381-4fd0-b3b9-2f1ae443a366" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="6f7ef526-a20c-4bbf-976d-e51536871fdd" processor="db:insert" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Insert student records into database" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="0a5d121d-ad04-4ef1-975e-38793f842da2" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[{&#10;  "message": "Student added successfully"&#10;}]' />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="ec1628f4-cbcc-4424-845a-bbbabeeea055">
+				<munit:payload value='#[[{&#10;  "student_name": "John Doe",&#10;  "email": "john@example.com",&#10;  "phone_number": "1234567890",&#10;  "date_of_joining": "2025-08-01",&#10;  "has_joined": "Yes"&#10;}]]' />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to post:\students:application\json:student-system-api-config" doc:id="fe599764-3589-418c-89f6-f182863abafb" name="post:\students:application\json:student-system-api-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="6db08583-19a2-47d4-84b2-1e2de83fbba4" is='#[MunitTools::equalTo({&#10;  "message": "Student added successfully"&#10;})]' expression="#[payload]" />
+		</munit:validation>
+	</munit:test>
+	<munit:test name="student-system-api-test-suite-get:\students\not-joined:student-system-api-configTest" doc:id="ee960d2e-6b12-4615-b8da-b272e134571c" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="1b5629a1-fff9-4e5e-94ba-7dfa41365a42" processor="db:select">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="retrieving the students who are not joineds" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="9e31be07-c416-494e-8ceb-cbee8f19065d" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[[{&#10;  "student_name": "Karan Joshi",&#10;  "email": "karan.joshi11@example.com",&#10;  "phone_number": "9456789012",&#10;  "date_of_joining": "2025-08-15",&#10;  "has_joined": "No"&#10;}]]' />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to get:\students\not-joined:student-system-api-config" doc:id="2f634b54-6341-4c1d-8f46-e39e59dd1911" name="get:\students\not-joined:student-system-api-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="5c318ed7-93c6-48a7-b099-7dc7231cd780" is='#[MunitTools::equalTo([{&#10;  "student_name": "Karan Joshi",&#10;  "email": "karan.joshi11@example.com",&#10;  "phone_number": "9456789012",&#10;  "date_of_joining": "2025-08-15",&#10;  "has_joined": "No"&#10;}])]' expression="#[payload]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="student-system-api-test-suite-post:\email\send:application\json:student-system-api-configTest" doc:id="d1965f38-a2f5-44e0-9b48-7cef9ea85db9" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="07dc3d42-c16a-412f-8eed-97770fba659e" processor="email:send">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Sending email alerts to the students who are not joined still" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="ecb66951-bf0e-4064-97cd-9dd14815b885" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="Email_SMTP" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[{&#10;  message: "Email sent successfully"&#10;}]' />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="b30b1ae4-f808-4f10-9626-cc8dacb8ec60" >
+				<munit:payload value='#[{&#10;                "student_id": 2,&#10;                "student_name": "NehaVerma",&#10;                "email": "neha.verma22@example.com",&#10;                "phone_number": "9012345678",&#10;                "date_of_joining": "2025-08-10",&#10;                "has_joined": "No"&#10;            }]' />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to post:\email\send:application\json:student-system-api-config" doc:id="03a7c8c6-7135-42b9-a567-f98353d5dc4d" name="post:\email\send:application\json:student-system-api-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="c871844a-ca6e-4d0e-a852-15595dabb9fd" expression="#[payload]" is='#[MunitTools::equalTo({&#10;	message:"Email sent successfully"&#10;})]'/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="student-system-api-test-suite-student-system-api-mainTest" doc:id="a58fdc2b-9ff6-4823-a47d-1ae91ef96f9d" description="Test" expectedErrorType="APIKIT:BAD_REQUEST">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="9ad85c27-7213-4d64-80fe-2b57eaba9794" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="student-system-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:BAD_REQUEST" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to student-system-api-main" doc:id="f0f8f1ef-ee97-4415-9fe9-7614d23e0144" name="student-system-api-main"/>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="student-system-api-test-suite-student-system-api-mainTest1" doc:id="8d7efb8f-3d49-4d94-957d-a27203890bc7" description="Test" expectedErrorType="APIKIT:NOT_FOUND">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="b49d2e8c-d9ac-450e-847b-2b8ee8e2b71c" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="student-system-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:NOT_FOUND" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to student-system-api-main" doc:id="593095f2-1ebc-4fd6-86a7-843b3e6f415e" name="student-system-api-main"/>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="student-system-api-test-suite-student-system-api-mainTest2" doc:id="d4d0241a-cc4e-498e-b1d8-511f6ab6caf4" description="Test" expectedErrorType="APIKIT:NOT_ACCEPTABLE">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="4935037b-4516-4dff-8641-fd1e1bf19031" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="student-system-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:NOT_ACCEPTABLE" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to student-system-api-main" doc:id="7ac07492-d279-4ff6-98fb-1a5a4592d203" name="student-system-api-main"/>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="student-system-api-test-suite-student-system-api-mainTest3" doc:id="3e92515a-1885-4504-9db1-bb49e9574725" description="Test" expectedErrorType="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="c7678101-5929-481d-946a-09dd7dbec94c" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="student-system-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:UNSUPPORTED_MEDIA_TYPE" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to student-system-api-main" doc:id="a620d9ec-dc4d-44d1-bef2-12e99bbfdcfa" name="student-system-api-main"/>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="student-system-api-test-suite-student-system-api-mainTest4" doc:id="81cb8ea2-439f-4c30-b099-d07bf3e8a3f6" description="Test" expectedErrorType="APIKIT:METHOD_NOT_ALLOWED">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="9697047a-cca0-4c26-a788-5528a64e7245" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="student-system-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:METHOD_NOT_ALLOWED" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to student-system-api-main" doc:id="0ca16db7-1ff0-462a-8d85-8a25e6ef040d" name="student-system-api-main"/>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="student-system-api-test-suite-student-system-api-mainTest5" doc:id="24233ba7-7538-4731-b364-6f46b6dce250" description="Test" expectedErrorType="APIKIT:NOT_IMPLEMENTED">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="954ef9b4-6b49-4901-90b0-ed9a6ba233ec" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="student-system-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:NOT_IMPLEMENTED" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to student-system-api-main" doc:id="40b4a7e8-2bef-4c76-a891-4c37d7096414" name="student-system-api-main"/>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="student-system-api-test-suite-student-system-api-mainTest6" doc:id="b8a9543a-eab0-4e2e-8984-840f7bdbdd4d" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="551190ba-dccb-46a4-a4a7-efa68f31d0db" processor="email:send">
+			<munit-tools:with-attributes>
+				<munit-tools:with-attribute whereValue="Sending email alerts to the students who are not joined still" attributeName="doc:name" />
+				<munit-tools:with-attribute whereValue="ecb66951-bf0e-4064-97cd-9dd14815b885" attributeName="doc:id" />
+				<munit-tools:with-attribute whereValue="${smtp.from.address}" attributeName="fromAddress" />
+			</munit-tools:with-attributes>
+			<munit-tools:then-return>
+				<munit-tools:error typeId="EMAIL:CONNECTIVITY" />
+			</munit-tools:then-return>
+		</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<set-payload value='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;  email: "test@example.com",&#10;  student_name: "Test Student"&#10;}]' doc:name="Set Payload" doc:id="7b763bdb-8a2c-4e33-99a2-aefba4b360b4" mimeType="application/json" />
+			<flow-ref doc:name="Flow-ref to student-system-api-main" doc:id="a2919bac-8fd1-4867-ba61-16f7001e4acd" name="post:\email\send:application\json:student-system-api-config"/>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="student-system-api-test-suite-post:\email\send:application\json:student-system-api-configTest2" doc:id="73e25173-8445-4404-90a4-03f339c2ada1" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="90f408af-e27c-4faa-8539-355f9b3b40d9" processor="email:send" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Sending email alerts to the students who are not joined still" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="ecb66951-bf0e-4064-97cd-9dd14815b885" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="Email_SMTP" attributeName="config-ref" />
+					<munit-tools:with-attribute whereValue="${smtp.from.address}" attributeName="fromAddress" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="EMAIL:SEND" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<set-payload value='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;  email: "test@example.com",&#10;  student_name: "Test Student"&#10;}]' doc:name="Set Payload" doc:id="36ce3304-65df-48a2-bd7d-48745fa5f2c9" mimeType="application/json" />
+			<flow-ref doc:name="Flow-ref to post:\email\send:application\json:student-system-api-config" doc:id="0ff7e30b-ac12-4b57-a09a-3379f84df6af" name="post:\email\send:application\json:student-system-api-config"/>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="student-system-api-test-suite-student-system-api-mainTest7" doc:id="6c5f9b89-8c07-4d33-a6f3-97f13f614bb5" description="Test" expectedErrorType="ANY">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="1e7fe704-a9b7-4d17-8ccd-d1bfe768cfc0" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="student-system-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="ANY" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to student-system-api-main" doc:id="30940bf0-842c-43a8-ac8f-d37f28ed8984" name="student-system-api-main"/>
+		</munit:execution>
+	</munit:test>
+
+
+</mule>

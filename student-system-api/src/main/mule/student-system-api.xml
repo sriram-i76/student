@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd ">
+    <flow name="student-system-api-main">
+        <http:listener path="${listener.path}" config-ref="HTTP_Listener_config">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="student-system-api-config" />
+        <error-handler ref="global-error-handler" />
+    </flow>
+    <flow name="patch:\students\(student_id):application\json:student-system-api-config">
+        <flow-ref doc:name="Flow Reference" doc:id="119d66b8-e924-4654-b1d5-4bc1c2e340d1" name="database-update-sub-flow" />
+	
+	
+    </flow>
+    <flow name="get:\students:student-system-api-config">
+        <flow-ref doc:name="Flow Reference" doc:id="43c55d6b-10c8-477e-839a-3f5482166906" name="database-retreive-sub-flow" />
+		
+    </flow>
+    <flow name="post:\email\send:application\json:student-system-api-config" doc:id="808a6e5b-3a20-4ebe-852c-e0d651fb8af1">
+		<flow-ref doc:name="Flow Reference" doc:id="5afd7d3e-d27e-4055-8e81-42679b39c3cd" name="send-email-sub-flow"/>
+		<error-handler ref="global-error-handler" />
+		
+		
+    </flow>
+    <flow name="post:\students:application\json:student-system-api-config">
+        <logger level="INFO" doc:name="system-api started" doc:id="28d76488-7544-4426-af83-2c97d5cc39ac" message="system-api started" />
+        <flow-ref doc:name="Flow Reference" doc:id="7ba08660-5438-45c6-ae8d-2abaf110aa8d" name="database-insert-sub-flow" />
+		
+    </flow>
+    <flow name="get:\students\not-joined:student-system-api-config">
+		<flow-ref doc:name="Flow Reference" doc:id="e5334879-8bb8-4702-b25d-a584060eea3c" name="students-not-joined-sub-flow"/>
+	
+    </flow>
+</mule>

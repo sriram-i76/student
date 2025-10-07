@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="database-retreive-sub-flow" doc:id="9e4fad7f-7de3-45ae-934a-f7be0c68f004" >
+		<logger level="INFO" doc:name="entered into dabase-retrieve sub flow in system-api" doc:id="1da1ffe2-5476-4c79-9baa-3174524e0ffd" message="entered into dabase-retrieve sub flow in system-api"/>
+		<set-variable value="#[%dw 2.0&#10;output application/java&#10;&#10;var queryBase = &quot;SELECT * FROM students WHERE 1=1&quot;&#10;---&#10;queryBase ++&#10;(if (attributes.queryParams.student_id != null) &#10;  &quot; AND student_id = &quot; ++ attributes.queryParams.student_id &#10; else &quot;&quot;) ++&#10;(if (attributes.queryParams.has_joined != null) &#10;  &quot; AND has_joined = '&quot; ++ attributes.queryParams.has_joined ++ &quot;'&quot; &#10; else &quot;&quot;) ++&#10;(if (attributes.queryParams.date_of_joining != null) &#10;  &quot; AND date_of_joining = '&quot; ++ attributes.queryParams.date_of_joining ++ &quot;'&quot; &#10; else &quot;&quot;)]" doc:name="store the final query to be used in select" doc:id="a71c51f6-c173-4cc1-a600-3dcd40008335" variableName="finalQuery "/>
+		<try doc:name="Try" doc:id="1a4278e8-5436-4006-954c-be3f61ae6795" >
+			<until-successful maxRetries="${until.tries}" doc:name="Until Successful" doc:id="5914cada-2370-44e4-9030-45d5c8a1faf9" millisBetweenRetries="${until.time}">
+			<db:select doc:name="Select to retrive the student data based on the queryparams" doc:id="22ebb1de-90a7-41d9-ac0c-766dec4bec1c" config-ref="Database_Config">
+			<db:sql><![CDATA[#[vars.finalQuery]]]></db:sql>
+		</db:select>
+		</until-successful>
+			<error-handler ref="global-error-handler" />
+		</try>
+		<logger level="INFO" doc:name="data is retrieved successfully and getting back to process-api" doc:id="31e5d86d-dcd6-4d7d-9823-2e763ffb734b" message="student data retrieved successfully and getting back to process-api" />
+	</sub-flow>
+</mule>

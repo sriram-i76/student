@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="database-update-sub-flow" doc:id="41cf5c33-2ecd-4151-ab55-e8c11d5a1a05" >
+		<logger level="INFO" doc:name="entered to database update sub-flow in system-api" doc:id="736d829e-bb21-4917-b28e-3b743f961a4c" message="entered to database update sub-flow in system-api"/>
+		<set-variable value="#[%dw 2.0&#10;output application/java&#10;var updates =&#10;  if (payload is Object)&#10;    payload pluck ((value, key) -&gt; key ++ &quot; = '&quot; ++ value as String ++ &quot;'&quot;)&#10;  else&#10;    []&#10;---&#10;&quot;UPDATE students SET &quot; ++ (updates joinBy &quot;, &quot;) ++ &#10;&quot; WHERE student_id = &quot; ++ attributes.uriParams.student_id]" doc:name="Set Variable to store the final updated query " doc:id="0a9a385f-dcbe-4f7a-b8bb-c47e35a622e4" variableName="finalUpdateQuery"/>
+		<try doc:name="Try" doc:id="21f1fef8-bec8-47f8-83ba-f2a5ac1692bf" >
+			<until-successful maxRetries="${until.tries}" doc:name="Until Successful" doc:id="25136ec3-65a2-4c4e-af1c-e261b125a89c" millisBetweenRetries="${until.time}">
+			<db:update doc:name="Update the database records of a particular record" doc:id="73ea3770-e6ae-4af0-8716-f221ed8c8857" config-ref="Database_Config">
+			<db:sql><![CDATA[#[vars.finalUpdateQuery]]]></db:sql>
+		</db:update>
+		</until-successful>
+			<error-handler ref="global-error-handler" />
+		</try>
+		<logger level="INFO" doc:name="records updated successfully and getting back to process-api" doc:id="3468e424-c7ea-4b87-ac7a-404609eebcc5" message="records updated successfully and getting back to process-api"/>
+	</sub-flow>
+</mule>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="students-not-joined-sub-flow" doc:id="1ddc0ad1-e6d0-4cb1-a1d2-9b0942bd0abc" >
+		<logger level="INFO" doc:name="entered into students-notjoined subflow" doc:id="016c800e-3f47-4ee7-a50e-c745b209bd69" message="entered into students-notjoined subflow"/>
+		<try doc:name="Try" doc:id="be4eedd9-f2ec-4790-beed-a156bff904f4" >
+			<until-successful maxRetries="${until.tries}" doc:name="Until Successful" doc:id="eb3f3368-52a3-431c-886b-db5d65ae2dc4" millisBetweenRetries="${until.time}">
+			<db:select doc:name="retrieving the students who are not joineds" doc:id="9e31be07-c416-494e-8ceb-cbee8f19065d" config-ref="Database_Config">
+			<db:sql><![CDATA[SELECT * FROM students WHERE has_joined = 'No']]></db:sql>
+		</db:select>
+		</until-successful>
+			<error-handler ref="global-error-handler" />
+		</try>
+		<ee:transform doc:name="Transforming records of notJoined students to scheduler flow" doc:id="ca05bbc0-b23f-4b09-9081-351a49688319" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="students who are not joined retrieved successfully" doc:id="ca6a8ec1-5dbb-4a8a-82d7-48594610d2b8" message="students who are not joined retrieved successfully"/>
+	</sub-flow>
+</mule>

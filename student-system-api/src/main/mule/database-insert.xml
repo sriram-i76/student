@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="database-insert-sub-flow" doc:id="409f1eb4-0db1-4e72-8146-50738e14f05d" >
+		<logger level="INFO" doc:name="entered into database subflow" doc:id="76b6a32d-471b-4b62-80fe-99326d5e2efc" message="entered into database subflow"/>
+		<try doc:name="Try" doc:id="68c7eff7-b849-40a5-b62b-b7a85d0ec63c" >
+			<until-successful maxRetries="${until.tries}" doc:name="Until Successful" doc:id="0b0bb009-7fea-4fcd-89d5-d296c6bcde59" millisBetweenRetries="${until.time}">
+			<db:insert doc:name="Insert student records into database" doc:id="0a5d121d-ad04-4ef1-975e-38793f842da2" config-ref="Database_Config">
+			<db:sql><![CDATA[INSERT INTO students (student_name, email, phone_number, date_of_joining, has_joined)
+VALUES (:student_name, :email, :phone_number, :date_of_joining, :has_joined)
+]]></db:sql>
+			<db:input-parameters><![CDATA[#[{
+        student_name: payload.student_name,
+        email: payload.email,
+        phone_number: payload.phone_number,
+        date_of_joining: payload.date_of_joining,
+        has_joined: payload.has_joined
+    }]]]></db:input-parameters>
+		</db:insert>
+		</until-successful>
+			<error-handler ref="global-error-handler" />
+		</try>
+		<logger level="INFO" doc:name="records inserted into database successfully and getting back to process-api" doc:id="3bdb4fcf-e61f-4540-9535-0377b61f08ec" message="records inserted into database successfully and getting back to process-api"/>
+	</sub-flow>
+</mule>
