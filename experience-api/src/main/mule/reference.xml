@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="referenceSub_Flow" doc:id="b9ac839a-43a4-4c9e-bd51-debde6c797f7" >
+		<logger level="INFO" doc:name="entered into the experience api subFlow" doc:id="5ba6e7c5-5625-4e97-9ceb-434dc269d031" message="entered into the experience api subFlow"/>
+		<logger level="INFO" doc:name="message has been successfully received from jira" doc:id="3ad3bf89-ae6e-4d70-86ff-5e98ceed8544" message="message has been successfully received from jira" />
+		<logger level="INFO" doc:name="Logger" doc:id="73ccddee-27dc-41f5-8c57-8124f0b89ac0" message="#[payload]"/>
+		<ee:transform doc:name="Transform Message to convert input from Jira into required JSON format" doc:id="fc503327-57f6-4770-9108-6253103916f0">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  taskId: payload.issue.key,
+  title: payload.issue.fields.summary,
+  status: payload.changelog.items[0].fromString,
+  assignee: payload.issue.fields.assignee.displayName,
+  dueDate: payload.issue.fields.duedate,
+  project: payload.issue.fields.project.name 
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="DEBUG" doc:name="Logger to see the message we are getting from jira and to be sent to process-api" doc:id="42c2216e-b2f5-4e9e-9704-96b5c8082de5" message="#[payload]"/>
+		<logger level="INFO" doc:name="calling process-api" doc:id="717373b1-377b-40bf-ae97-0dfda46a8a5d" message="sending request to process-api"/>
+		<http:request method="POST" doc:name="Request to call process-api" doc:id="1d227ed7-c7c8-42c9-92f9-c725b6d86ff8" config-ref="HTTP-Request-configuration-to-call-process-api" path="${http.path}"/>
+		<logger level="INFO" doc:name="process-api successfully executed and getting back to experience api" doc:id="a66c3a45-98b1-4159-a445-2d2ecf08b35b" message="process-api successfully executed and getting back to experience api"/>
+	</sub-flow>
+</mule>
